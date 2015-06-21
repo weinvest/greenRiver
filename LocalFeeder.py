@@ -1,0 +1,126 @@
+
+from EventNode import EventNode
+import pandas as pd
+from os import path
+from IFeeder import IFeeder
+from Float import Float
+class LocalFeeder(IFeeder):
+    def __init__(self, instrument, dataPath):
+        self.instrument = instrument
+        self.dataPath = dataPath
+        self.columns = ["Recivetime","LastPrice","LastQty","Bid1Price","Bid1Qty",
+                        "Ask1Price","Ask1Qty","Bid2Price", "Bid2Qty","Ask2Price",
+                        "Ask2Qty","Bid3Price","Bid3Qty","Ask3Price","Ask3Qty",
+                        "Bid4Price","Bid4Qty","Ask4Price","Ask4Qty","Bid5Price",
+                        "Bid5Qty","Ask5Price","Ask5Qty","TotalQty","AveragePrice",
+                        "OpenPrice","HighestPrice","LowestPrice","ClosePrice","PrevClosePrice",
+                        "SettlementPrice","PrevSettlementPrice","OpenInterest","PrevInterest",
+                        "Turnover","LowerLimit","UpperLimit","CurrentDelta","PrevDelta",
+                        "FeedPhase"]
+        self.data = None
+        self.currentRow = None
+
+    def initialize(self, tradingDay, tradingSession, time):
+        dataFileName = self.getDataFileName(tradingDay, tradingSession)
+        dataFilePath = path.join(self.getDataDirectory(tradingDay,tradingSession), dataFileName)
+        if not path.exists(dataFilePath):
+            repTradingDay = tradingDay.strftime('%Y%m%d')
+            compressFileName = path.join(self.getDataDirectory(tradingDay, tradingSession)
+                                         , repTradingDay + '.tar.bz2')
+            if path.exists(compressFileName):
+                import tarfile
+                tmpDirectory = path.join('/tmp/',repTradingDay)
+                dataFilePath = path.join(tmpDirectory,dataFileName)
+                if not path.exists(dataFilePath):
+                    compressFile = tarfile.open(compressFileName,'r:bz2')
+                    compressFile.extract(path.join(repTradingDay,dataFileName), '/tmp/')
+        self.data = pd.read_csv(dataFilePath
+                                , parse_dates=True
+                                , skiprows=2
+                                , delimiter='\s+'
+                                , index_col=0
+                                , names=self.columns
+                                )
+        self.data.LastQty = self.data.TotalQty - self.data.TotalQty.shift(1)
+        self.bubble(time)
+
+    def bubble(self, time):
+        self.currentRow = self.data.ix[time]
+
+    def getDataFileName(self,tradingDay,tradingSession):
+        return self.instrument.FeedCode + tradingDay.strftime('_%Y%m%d.txt')
+
+    def getDataDirectory(self,tradingDay, tradingSession):
+        subDir = path.join(self.dataPath,'day')
+        if tradingSession.Name == 'NIGHT':
+            subDir = path.join(self.dataPath, 'night')
+
+        return path.join(subDir,tradingDay.strftime('%Y'), tradingDay.strftime('%Y%m'), tradingDay.strftime('%Y%m%d'))
+
+    def getMidPrice(self):
+        bestBidPrice = self.getBidPrice(0)
+        bestAskPrice = self.getAskPrice(0)
+        if bestBidPrice is not Float.nan and bestAskPrice is not Float.nan:
+            return (bestBidPrice + bestAskPrice) / 2
+        elif bestBidPrice is not Float.nan:
+            return bestBidPrice
+        elif bestAskPrice is not Float.nan:
+            return bestAskPrice
+        else:
+            return Float.nan
+
+    def _getAttrFromCurrentRow(self,attrName,defaultValue):
+        if self.currentRow is None:
+            return defaultValue
+        else:
+            return getattr(self.currentRow,attrName)
+
+    def getBidPrice(self, level):
+        return self._getAttrFromCurrentRow('Bid%dPrice' % (level + 1), Float.nan)
+
+    def getBidQty(self, level):
+        return self._getAttrFromCurrentRow('Bid%dQty' % (level + 1), 0)
+
+    def getAskPrice(self, level):
+        return self._getAttrFromCurrentRow('Ask%dPrice' % (level + 1), Float.nan)
+
+    def getAskQty(self, level):
+        return self._getAttrFromCurrentRow('Ask%dQty' % (level + 1), 0)
+
+    def getLastPrice(self, level):
+        return self._getAttrFromCurrentRow('LastPrice', Float.nan)
+
+    def getLastQty(self, level):
+        return self._getAttrFromCurrentRow('LastQty', 0)
+
+    def getUpperLimit(self):
+        return self._getAttrFromCurrentRow('UpperLimit', Float.max)
+
+    def getLowerLimit(self):
+        return self._getAttrFromCurrentRow('LowerLimit', 0)
+
+    def getPrevClose(self):
+        return self._getAttrFromCurrentRow('PrevClosePrice', Float.nan)
+
+    def getPrevSettlement(self):
+        return self._getAttrFromCurrentRow('PrevSettlementPrice', Float.nan)
+
+    def getOpenInterest(self):
+        return self._getAttrFromCurrentRow('OpenInterest', 0)
+
+if __name__ == '__main__':
+    import nose
+    from Calendar import Calendar
+    from Dict import Dict
+
+    def test_initialize():
+        instrument = Dict(Name = 'IF_01',FeedCode='IF1501')
+        feeder = LocalFeeder(instrument,'/home/shgli/data')
+        feeder.initialize(Calendar.dateFromInt(20150105),Dict(Name='AM'),None)
+        print feeder.data.Ask1Price
+        assert feeder.data
+
+    def test_bubble():
+        pass
+
+    nose.runmodule()

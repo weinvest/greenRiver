@@ -3,22 +3,26 @@ __author__ = 'shgli'
 class ITradingComponent(object):
 
     def __init__(self):
-        self.mCurrentTradingSession = None
+        self.currentTradingSession = None
+        self.tradingDay = None
 
     def onBeginDay(self,tradingDay):
-        pass
+        self.tradingDay = tradingDay
 
     def onEndDay(self,tradingDay):
         pass
 
     def onTradingSessionChange(self,fromSession,toSession):
-        pass
+        self.currentTradingSession = toSession
 
     def initialize(self):
         pass
 
+    def getTradingDay(self):
+        return self.tradingDay
+
     def getCurrentTradingSession(self):
-        return self.mCurrentTradingSession
+        return self.currentTradingSession
 
 
 
