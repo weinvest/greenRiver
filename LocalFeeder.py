@@ -1,9 +1,12 @@
 
 from EventNode import EventNode
 import pandas as pd
+import os
 from os import path
 from IFeeder import IFeeder
 from Float import Float
+from dateutil.parser import parse
+
 class LocalFeeder(IFeeder):
     def __init__(self, instrument, dataPath):
         self.instrument = instrument
@@ -22,24 +25,29 @@ class LocalFeeder(IFeeder):
 
     def initialize(self, tradingDay, tradingSession, time):
         dataFileName = self.getDataFileName(tradingDay, tradingSession)
-        dataFilePath = path.join(self.getDataDirectory(tradingDay,tradingSession), dataFileName)
+        dataFilePath = path.join(self.getDataDirectory(tradingDay, tradingSession), dataFileName)
+        repTradingDay = tradingDay.strftime('%Y%m%d')
         if not path.exists(dataFilePath):
-            repTradingDay = tradingDay.strftime('%Y%m%d')
             compressFileName = path.join(self.getDataDirectory(tradingDay, tradingSession)
                                          , repTradingDay + '.tar.bz2')
             if path.exists(compressFileName):
                 import tarfile
-                tmpDirectory = path.join('/tmp/',repTradingDay)
-                dataFilePath = path.join(tmpDirectory,dataFileName)
+                tmpRoot = path.join('/tmp/', tradingSession.name)
+                tmpDirectory = path.join(tmpRoot, repTradingDay)
+                if not path.exists(tmpDirectory):
+                    os.makedirs(tmpDirectory)
+
+                dataFilePath = path.join(tmpDirectory, dataFileName)
                 if not path.exists(dataFilePath):
                     compressFile = tarfile.open(compressFileName,'r:bz2')
-                    compressFile.extract(path.join(repTradingDay,dataFileName), '/tmp/')
+                    compressFile.extract(path.join(repTradingDay,dataFileName), tmpRoot)
         self.data = pd.read_csv(dataFilePath
                                 , parse_dates=True
                                 , skiprows=2
                                 , delimiter='\s+'
                                 , index_col=0
                                 , names=self.columns
+                                , date_parser = lambda x : parse(repTradingDay + ' ' + x)
                                 )
         self.data.LastQty = self.data.TotalQty - self.data.TotalQty.shift(1)
         self.bubble(time)
@@ -51,8 +59,8 @@ class LocalFeeder(IFeeder):
         return self.instrument.FeedCode + tradingDay.strftime('_%Y%m%d.txt')
 
     def getDataDirectory(self,tradingDay, tradingSession):
-        subDir = path.join(self.dataPath,'day')
-        if tradingSession.Name == 'NIGHT':
+        subDir = path.join(self.dataPath, 'day')
+        if tradingSession.name == 'NIGHT':
             subDir = path.join(self.dataPath, 'night')
 
         return path.join(subDir,tradingDay.strftime('%Y'), tradingDay.strftime('%Y%m'), tradingDay.strftime('%Y%m%d'))
@@ -111,12 +119,13 @@ class LocalFeeder(IFeeder):
 if __name__ == '__main__':
     import nose
     from Calendar import Calendar
+    from datetime import datetime
     from Dict import Dict
 
     def test_initialize():
         instrument = Dict(Name = 'IF_01',FeedCode='IF1501')
         feeder = LocalFeeder(instrument,'/home/shgli/data')
-        feeder.initialize(Calendar.dateFromInt(20150105),Dict(Name='AM'),None)
+        feeder.initialize(Calendar.dateFromInt(20150105),Dict(name='AM'),datetime.strptime('20150105 09:20:00.000','%Y%m%d %H:%M:%S.%f'))
         print feeder.data.Ask1Price
         assert feeder.data
 

@@ -6,10 +6,10 @@ class ITradingComponent(object):
         self.currentTradingSession = None
         self.tradingDay = None
 
-    def onBeginDay(self,tradingDay):
+    def onBeginDay(self, tradingDay):
         self.tradingDay = tradingDay
 
-    def onEndDay(self,tradingDay):
+    def onEndDay(self, tradingDay):
         pass
 
     def onTradingSessionChange(self,fromSession,toSession):

@@ -1,10 +1,17 @@
 __author__ = 'shgli'
-
+import Logger
 from ITradingComponent import ITradingComponent
 class FeedSource(ITradingComponent):
     def __init__(self, feederCreator):
+        if feederCreator is None:
+            Logger.critical("feed creator is None")
+
         self.feeders = {}
         self.feederCreator = feederCreator
+
+
+    def initialize(self):
+        pass
 
     def subscribe(self,instrument):
         if not self.feeders.has_key(instrument.Name):

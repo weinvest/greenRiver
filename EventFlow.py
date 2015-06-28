@@ -6,6 +6,7 @@ class EventFlow(object):
     def __init__(self):
         self.changed = False
         self.nodes = set()
+        self.sortedNodes = None
         self.raisedNodes = []
         self.maxLevel = []
 
@@ -22,17 +23,24 @@ class EventFlow(object):
         self.raisedNodes[level].add(node)
 
     def assignLevel(self):
+        if not self.changed:
+            return
+
         dependencyDict = {}
         for node in self.nodes:
             dependencyDict[node] = node.precursors
         self.maxLevel = 0
-        nodes = toposort_flatten(dependencyDict)
-        for node in nodes:
+        self.sortedNodes = toposort_flatten(dependencyDict)
+        for node in self.sortedNodes:
             maxLevel = -1
             for precursor in node.precursors:
                 maxLevel = max(maxLevel, node.level)
             node.level = maxLevel + 1
             self.maxLevel = max(self.maxLevel,node.level)
+
+    def foreachNode(self,visitor):
+        for node in self.self.sortedNodes:
+            visitor(node)
 
     def process(self,processId):
         runList = self.raisedNodes
