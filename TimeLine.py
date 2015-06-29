@@ -1,4 +1,6 @@
 __author__ = 'shgli'
 
 class TimeLine(object):
-    pass
+    def __init__(self):
+        self.time = None
+        self.tradingDay = None

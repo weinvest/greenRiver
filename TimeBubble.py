@@ -3,12 +3,14 @@ import heapq
 import datetime
 
 class TimeBuble(object):
-    def __init__(self):
+    def __init__(self,timeLine):
         self.tasks = []
-        self.lastTime = datetime.datetime(1970,0,0)
+        self.timeLine = timeLine
 
     def add(self, task):
-        heapq.heappush(self.tasks, (task.time, task))
+        nextTime = task.getNextTime()
+        if nextTime:
+            heapq.heappush(self.tasks, (nextTime, task))
 
     def pop(self):
         return heapq.heappop(self.tasks)
@@ -16,9 +18,16 @@ class TimeBuble(object):
     def isEmpty(self):
         return 0 == len(self.tasks)
 
-    def process(self, processId):
+    def bubble(self):
         if not self.isEmpty():
             curtime, task = self.pop()
-            while not self.isEmpty() and curtime == self.tasks[0][0]:
-                task.process(processId)
+            self.timeLine = curtime
+            while not self.isEmpty() and curtime == task.getNextTime():
+                if task.bubble():
+                    self.add(task)
+                task = self.pop()[1]
+
+            return curtime
+
+        return None
 

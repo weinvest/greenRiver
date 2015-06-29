@@ -1,7 +1,10 @@
 __author__ = 'shgli'
 
 class IFeederCreator(object):
-    def create(self):
+    def __init__(self):
+        pass
+
+    def create(self,timeLine):
         pass
 
     def adjustStartDay(self,time):

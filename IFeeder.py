@@ -1,6 +1,9 @@
 __author__ = 'shgli'
 from EventNode import EventNode
-class IFeeder(EventNode):
+from TimeTask import TimeTask
+class IFeeder(EventNode,TimeTask):
+    def __init__(self,timeLine):
+        self.timeLine = timeLine
 
     def getMidPrice(self):
         pass

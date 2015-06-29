@@ -48,7 +48,7 @@ class EventFlow(object):
 
         for level in range(0,self.maxLevel + 1):
             for node in runList[level]:
-                node.process(processId)
+                node.bubble(processId)
 
         self.assignLevel()
 

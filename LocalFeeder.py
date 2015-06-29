@@ -8,7 +8,9 @@ from Float import Float
 from dateutil.parser import parse
 
 class LocalFeeder(IFeeder):
-    def __init__(self, instrument, dataPath):
+    def __init__(self, instrument, timeLine, dataPath):
+        super(LocalFeeder,self).__init__(timeLine)
+
         self.instrument = instrument
         self.dataPath = dataPath
         self.columns = ["Recivetime","LastPrice","LastQty","Bid1Price","Bid1Qty",
@@ -22,8 +24,10 @@ class LocalFeeder(IFeeder):
                         "FeedPhase"]
         self.data = None
         self.currentRow = None
+        self.currentLoc = -1
+        self.nextLoc = 0
 
-    def initialize(self, tradingDay, tradingSession, time):
+    def initialize(self, tradingDay, tradingSession):
         dataFileName = self.getDataFileName(tradingDay, tradingSession)
         dataFilePath = path.join(self.getDataDirectory(tradingDay, tradingSession), dataFileName)
         repTradingDay = tradingDay.strftime('%Y%m%d')
@@ -50,10 +54,9 @@ class LocalFeeder(IFeeder):
                                 , date_parser = lambda x : parse(repTradingDay + ' ' + x)
                                 )
         self.data.LastQty = self.data.TotalQty - self.data.TotalQty.shift(1)
-        self.bubble(time)
 
-    def bubble(self, time):
-        self.currentRow = self.data.ix[time]
+        self.nextLoc = self.data.index.searchsorted(self.timeLine.time,side='right')
+        self.currentLoc = self.nextLoc - 1
 
     def getDataFileName(self,tradingDay,tradingSession):
         return self.instrument.FeedCode + tradingDay.strftime('_%Y%m%d.txt')
@@ -115,6 +118,22 @@ class LocalFeeder(IFeeder):
 
     def getOpenInterest(self):
         return self._getAttrFromCurrentRow('OpenInterest', 0)
+
+    def getNextTime(self):
+        if self.nextLoc >= len(self.data.index):
+            return None
+        return self.data.index[self.nextLoc]
+
+    def bubble(self):
+        self.currentLoc = self.nextLoc
+        self.nextLoc += 1
+        self.raiseSelf()
+        return True
+
+    def doProcess(self, processId):
+        self.currentRow = self.data.iloc[self.currentLoc]
+        return True
+
 
 if __name__ == '__main__':
     import nose

@@ -2,6 +2,7 @@ __author__ = 'shgli'
 from EventFlow import EventFlow
 from TimeBubble import TimeBuble
 from TimeLine import TimeLine
+from datetime import datetime
 import Logger
 class TradingContext(object):
 
@@ -10,11 +11,11 @@ class TradingContext(object):
         self.feedSource = None
         self.calendar = None
 
-        self._eventFlow = EventFlow()
-        self._timeBubble = TimeBuble()
+        self.timeLine = TimeLine()
+        self.eventFlow = EventFlow()
+        self.timeBubble = TimeBuble(self.timeLine)
         self.fromDay = fromDay
         self.toDay = toDay
-        self.timeLine = TimeLine()
 
     def check(self):
         if self.calendar is None:
@@ -39,17 +40,23 @@ class TradingContext(object):
 
         runId = 1
         self.timeLine.tradingDay = self.calendar.getPreviousTradingDay(self.fromDay)
-        self._eventFlow.foreachNode(lambda node: node.onBeginDay(self.timeLine.tradingDay))
 
         while self.timeLine.tradingDay < self.toDay:
-            self.timeLine.tradingDay = self.calendar.getNextTradingDay(self.timeLine.tradingDay)
+            tradingDay = self.calendar.getNextTradingDay(self.timeLine.tradingDay)
+            self.timeLine.tradingDay = tradingDay
+            self.timeLine.time = datetime(tradingDay.year, tradingDay.month, tradingDay.day)
 
-            self._timeBubble.
+            #emit onBeginDay event
+            self.instrumentManager.onBeginDay(self.timeLine.tradingDay)
+            self.feedSource.onBeginDay(self.timeLine.tradingDay)
+            self.eventFlow.foreachNode(lambda node: node.onBeginDay(self.timeLine.tradingDay))
 
+            while self.timeBubble.bubble():
+                self.eventFlow.process(runId)
 
-            self._timeBubble.process(runId)
-            self._eventFlow.process(runId)
-
-            self._eventFlow.foreachNode(lambda node: node.onEndDay(self.timeLine.tradingDay))
+            #emit onEndDay event
+            self.eventFlow.foreachNode(lambda node: node.onEndDay(self.timeLine.tradingDay))
+            self.feedSource.onEndDay(self.timeLine.tradingDay)
+            self.instrumentManager.onEndDay(self.timeLine.tradingDay)
 
 

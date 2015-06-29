@@ -5,8 +5,8 @@ class LocalFeederCreator(IFeederCreator):
     def __init__(self,path):
         self.path = path
 
-    def create(self,instrument):
-        return LocalFeeder(instrument, self.path)
+    def create(self,instrument,timeLine):
+        return LocalFeeder(instrument, timeLine, self.path)
 
     def adjustStartDay(self, day):
         pass

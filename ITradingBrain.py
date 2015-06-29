@@ -4,7 +4,7 @@ from ITradingComponent import ITradingComponent
 class TradingBrain(ITradingComponent):
 
     def __init__(self,tradingContext):
-        self.tradingContext = tradingContext
+        super(TradingBrain,self).__init__(tradingContext)
 
     def subscribe(self,symbol):
         instrument = self.tradingContext.instrumentManager.getFuture(symbol)
