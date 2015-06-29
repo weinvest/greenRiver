@@ -9,7 +9,7 @@ class LocalFeederCreator(IFeederCreator):
         return LocalFeeder(instrument, timeLine, self.path)
 
     def adjustStartDay(self, day):
-        pass
+        return day
 
     def adjustEndDay(self, day):
-        pass
+        return day

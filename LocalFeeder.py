@@ -27,7 +27,8 @@ class LocalFeeder(IFeeder):
         self.currentLoc = -1
         self.nextLoc = 0
 
-    def initialize(self, tradingDay, tradingSession):
+    def initialize(self,tradingSession):
+        tradingDay = self.timeLine.tradingDay
         dataFileName = self.getDataFileName(tradingDay, tradingSession)
         dataFilePath = path.join(self.getDataDirectory(tradingDay, tradingSession), dataFileName)
         repTradingDay = tradingDay.strftime('%Y%m%d')
@@ -142,9 +143,9 @@ if __name__ == '__main__':
     from Dict import Dict
 
     def test_initialize():
-        instrument = Dict(Name = 'IF_01',FeedCode='IF1501')
-        feeder = LocalFeeder(instrument,'/home/shgli/data')
-        feeder.initialize(Calendar.dateFromInt(20150105),Dict(name='AM'),datetime.strptime('20150105 09:20:00.000','%Y%m%d %H:%M:%S.%f'))
+        instrument = Dict(Name = 'IF_01',FeedCode='IF1509')
+        feeder = LocalFeeder(instrument,Dict(tradingDay = Calendar.dateFromInt(20150629),time=datetime.strptime('20150629 09:20:00.000','%Y%m%d %H:%M:%S.%f')),'/home/shgli/data')
+        feeder.initialize(Dict(name='AM'))
         print feeder.data.Ask1Price
         assert feeder.data
 

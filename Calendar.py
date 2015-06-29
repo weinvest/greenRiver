@@ -9,7 +9,7 @@ class Calendar(object):
         self.holidays = []
         for holidayLine in holidayFile:
             holidayLine = holidayLine.strip()
-            if 0 != len(holidayLine) and holidayLine[0] != '#':
+            if 8 == len(holidayLine) and holidayLine[0] != '#':
                 print(holidayLine)
                 holiday = self.dateFromString(holidayLine)
                 self.holidays.append(holiday)

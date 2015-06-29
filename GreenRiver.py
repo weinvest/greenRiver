@@ -19,16 +19,15 @@ if __name__ == '__main__':
     parser.add_argument('-o','--holidayFile',help='holiday file')
     parser.add_argument('-f','--fromDay',help='backtest from this day')
     parser.add_argument('-t','--toDay',help='backtest to this day')
-    parser.add_argument('-h','--help',help = 'print this info')
     args = parser.parse_args()
 
 
     tradingContext = TradingContext()
     tradingContext.instrumentManager = InstrumentManager(tradingContext,args.mappingRoot)
     tradingContext.feedSource = FeedSource(tradingContext,LocalFeederCreator(args.dataRoot))
-    tradingContext.calendar = Calendar(args.holidyFile)
+    tradingContext.calendar = Calendar(open(args.holidayFile,'r'))
 
-    tradingContext.initialize(args.fromDay,args.toDay)
+    tradingContext.initialize(Calendar.dateFromString(args.fromDay),Calendar.dateFromString(args.toDay))
 
     tradingContext.run()
 
