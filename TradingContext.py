@@ -6,7 +6,7 @@ from datetime import datetime
 import Logger
 class TradingContext(object):
 
-    def __init__(self,fromDay, toDay):
+    def __init__(self):
         self.instrumentManager = None
         self.feedSource = None
         self.calendar = None
@@ -14,8 +14,7 @@ class TradingContext(object):
         self.timeLine = TimeLine()
         self.eventFlow = EventFlow()
         self.timeBubble = TimeBuble(self.timeLine)
-        self.fromDay = fromDay
-        self.toDay = toDay
+
 
     def check(self):
         if self.calendar is None:
@@ -30,13 +29,14 @@ class TradingContext(object):
         if self.fromDay > self.toDay:
             Logger.critical('adjusted fromDay > adjusted toDay : (%s > %s)' % (self.fromDay.strftime('%Y%m%d'),self.toDay.strftime('%Y%m%d')))
 
-
-    def run(self):
-        self.check()
-
+    def initialize(self,fromDay, toDay):
+        self.fromDay = fromDay
+        self.toDay = toDay
         self.instrumentManager.initialize()
         self.feedSource.initialize()
 
+    def run(self):
+        self.check()
 
         runId = 1
         self.timeLine.tradingDay = self.calendar.getPreviousTradingDay(self.fromDay)
