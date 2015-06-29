@@ -2,7 +2,7 @@ __author__ = 'shgli'
 
 class Dict(dict):
     """
-    A Storage object is like a dictionary except `obj.foo` can be used
+    A Dict object is like a dictionary except `obj.foo` can be used
     in addition to `obj['foo']`.
         >>> o = storage(a=1)
         >>> o.a
