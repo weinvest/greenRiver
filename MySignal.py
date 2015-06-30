@@ -3,15 +3,15 @@ from ISignal import ISignal
 from FeedLevel import FeedLevel
 
 class MySignal(ISignal):
-    def __init__(self, symbol,maxLevel):
-        super(MySignal, self).__init__()
+    def __init__(self, name, tradingContext, symbol,maxLevel):
+        super(MySignal, self).__init__('mySignal',tradingContext)
         self.symbol = symbol
         self.maxLevel = maxLevel
         self.bids = []
         self.asks = []
 
     def onBeginDay(self):
-        self.feeder = self.subscribeSymbol(self.symbol)
+        self.feeder = self.subscribe(self.symbol)
 
     def onMarketData(self,dates):
         self.updateBids(self.feeder.bid1Price,self.feeder.bid1Qty)

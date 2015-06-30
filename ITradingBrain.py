@@ -3,8 +3,8 @@ from ITradingComponent import ITradingComponent
 import EventType
 class ITradingBrain(ITradingComponent):
 
-    def __init__(self,tradingContext):
-        super(ITradingBrain,self).__init__(tradingContext)
+    def __init__(self,name,type,tradingContext):
+        super(ITradingBrain,self).__init__(name,type,tradingContext)
         self.__timer = []
         self.__marketData = []
 

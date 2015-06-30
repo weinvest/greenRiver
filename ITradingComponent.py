@@ -2,7 +2,8 @@ __author__ = 'shgli'
 from EventNode import EventNode
 class ITradingComponent(EventNode):
 
-    def __init__(self,tradingContext):
+    def __init__(self,name,type,tradingContext):
+        super(ITradingComponent,self).__init__(name,type)
         self.currentTradingSession = None
         self.tradingContext = tradingContext
 
