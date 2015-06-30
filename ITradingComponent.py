@@ -1,11 +1,9 @@
 __author__ = 'shgli'
-
-class ITradingComponent(object):
+from EventNode import EventNode
+class ITradingComponent(EventNode):
 
     def __init__(self,tradingContext):
         self.currentTradingSession = None
-        self.tradingDay = None
-        self.timeLine = None
         self.tradingContext = tradingContext
 
     def onBeginDay(self, tradingDay):
@@ -21,15 +19,18 @@ class ITradingComponent(object):
         pass
 
     def getTradingDay(self):
-        return self.timeLine.tradingDay
+        return self.tradingContext.timeLine.tradingDay
 
     def getTime(self):
-        return self.timeLine.time
+        return self.tradingContext.timeLine.time
 
     def getCurrentTradingSession(self):
         return self.currentTradingSession
 
     def addTask(self,task):
         self.tradingContext.timeBubble.add(task)
+
+    def doProcess(self, processId):
+        pass
 
 

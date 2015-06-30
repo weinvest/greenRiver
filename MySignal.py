@@ -15,7 +15,7 @@ class MySignal(ISignal):
 
     def onMarketData(self,dates):
         self.updateBids(self.feeder.bid1Price,self.feeder.bid1Qty)
-        self.updateAsks(self.feeder.ask1Price,self.feeeder.bid1Qty)
+        self.updateAsks(self.feeder.ask1Price,self.feeder.bid1Qty)
 
     def updateBids(self,price,qty):
         tickPrice = round(price / self.feeder.instrument.tickSize)

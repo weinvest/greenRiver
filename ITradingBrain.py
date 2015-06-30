@@ -1,10 +1,12 @@
 __author__ = 'shgli'
 from ITradingComponent import ITradingComponent
-
-class TradingBrain(ITradingComponent):
+import EventType
+class ITradingBrain(ITradingComponent):
 
     def __init__(self,tradingContext):
-        super(TradingBrain,self).__init__(tradingContext)
+        super(ITradingBrain,self).__init__(tradingContext)
+        self.__timer = []
+        self.__marketData = []
 
     def subscribe(self,symbol):
         instrument = self.tradingContext.instrumentManager.getFuture(symbol)
@@ -12,3 +14,29 @@ class TradingBrain(ITradingComponent):
             return None
 
         return self.tradingContext.feedSource.subscribe(instrument)
+
+    def onRaised(self,source):
+        if EventType.FeedEvent == source.evtType:
+            self.__marketData.append(source)
+        elif EventType.TimerEvent == source.evtType:
+            self.__timer.append(source)
+
+    def onMarketData(self,data):
+        pass
+
+    def onTimer(self,timer):
+        pass
+
+    def doProcess(self, processId):
+        hasEvent = False
+        if 0 != len(self.__marketData):
+            self.onMarketData(self.__marketData)
+            self.__marketData = []
+            hasEvent = True
+
+        if 0 != len(self.__timer):
+            for timer in self.__timer:
+                self.onTimer(timer)
+            self.__timer = []
+            hasEvent = True
+        return hasEvent

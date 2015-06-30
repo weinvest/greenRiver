@@ -2,13 +2,14 @@ __author__ = 'shgli'
 
 
 class EventNode(object):
-    def __init__(self, name):
+    def __init__(self, name,type):
         self.name = name;
         self.successors = set()
         self.precursors = set()
         self.eventFlow = None
         self.level = 0
         self.beRaised = False
+        self.evtType = type
 
     def setEventFlow(self, eventFlow):
         self.eventFlow = eventFlow
@@ -32,10 +33,15 @@ class EventNode(object):
     def raiseSuccessor(self):
         for successor in self.successors:
             successor.raiseSelf()
+            successor.onRaised(self)
+
+    def onRaised(self,source):
+        pass
 
     def process(self, processId):
         self.beRaised = False
-        self.doProcess(processId)
+        if self.doProcess(processId):
+            self.raiseSuccessor()
 
     def doProcess(self, processId):
         pass

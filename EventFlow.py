@@ -6,7 +6,7 @@ class EventFlow(object):
     def __init__(self):
         self.changed = False
         self.nodes = set()
-        self.sortedNodes = None
+        self.sortedNodes = set()
         self.raisedNodes = []
         self.maxLevel = []
 
@@ -39,7 +39,7 @@ class EventFlow(object):
             self.maxLevel = max(self.maxLevel,node.level)
 
     def foreachNode(self,visitor):
-        for node in self.self.sortedNodes:
+        for node in self.sortedNodes:
             visitor(node)
 
     def process(self,processId):
