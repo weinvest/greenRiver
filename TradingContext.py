@@ -55,7 +55,11 @@ class TradingContext(object):
                 self.eventFlow.process(runId)
 
             #emit onEndDay event
-            self.eventFlow.foreachNode(lambda node: node.onEndDay(self.timeLine.tradingDay))
+            def invokeOnEnd(node):
+                if hasattr(node,'onEndDay'):
+                    node.onEndDay(self.timeLine.tradingDay)
+
+            self.eventFlow.foreachNode(invokeOnEnd)
             self.feedSource.onEndDay(self.timeLine.tradingDay)
             self.instrumentManager.onEndDay(self.timeLine.tradingDay)
 

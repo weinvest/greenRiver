@@ -9,7 +9,7 @@ from dateutil.parser import parse
 
 class LocalFeeder(IFeeder):
     def __init__(self, instrument, timeLine, dataPath):
-        super(LocalFeeder,self).__init__(instrument.Name,timeLine)
+        super(LocalFeeder, self).__init__(instrument.Name,timeLine)
 
         self.instrument = instrument
         self.dataPath = dataPath

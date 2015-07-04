@@ -13,16 +13,15 @@ class EventNode(object):
 
     def setEventFlow(self, eventFlow):
         self.eventFlow = eventFlow
-        eventFlow.addNode(self)
 
     def connect(self, other):
         other.precursors.add(self)
-        self.successor.add(other)
+        self.successors.add(other)
         self.eventFlow.setChanged()
 
     def disconnect(self, other):
         other.precursors.remove(self)
-        self.successor.remove(other)
+        self.successors.remove(other)
         self.eventFlow.setChanged()
 
     def raiseSelf(self):

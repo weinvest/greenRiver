@@ -1,8 +1,9 @@
 __author__ = 'shgli'
+from TradingSession import TradingSession
 class ITradingComponent(object):
 
     def __init__(self, name, tradingContext):
-        self.currentTradingSession = None
+        self.currentTradingSession = TradingSession('AM','','')
         self.tradingContext = tradingContext
 
     def onBeginDay(self, tradingDay):

@@ -18,6 +18,7 @@ class OutputMarket(ISignal):
 
     def onBeginDay(self, tradingDay):
         self.feeder = self.subscribe(self.symbol)
+        self.feeder.connect(self)
         print('Bid1Price,Bid1Qty,Ask1Qty,Ask1Price')
 
     def onMarketData(self,dates):
@@ -27,7 +28,7 @@ class OutputMarket(ISignal):
         self.feeder.data.LastPrice.plot()
 
 if __name__ == '__main__':
-    scriptPath,greenRiver = os.path.split(os.path.abspath(sys.argv[0]))
+    scriptPath, greenRiver = os.path.split(os.path.abspath(sys.argv[0]))
 
     parser = argparse.ArgumentParser(prog=greenRiver
         ,description = " generate tailsignal configure")

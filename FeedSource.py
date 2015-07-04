@@ -19,6 +19,7 @@ class FeedSource(ITradingComponent):
         if not self.feeders.has_key(instrument.Name):
             feeder = self.feederCreator.create(instrument,self.tradingContext.timeLine)
             feeder.initialize(self.getCurrentTradingSession())
+            self.tradingContext.eventFlow.addNode(feeder)
             self.feeders[instrument.Name] = feeder
             self.addTask(feeder)
         return self.feeders[instrument.Name]

@@ -19,15 +19,19 @@ class TimeBuble(object):
         return 0 == len(self.tasks)
 
     def bubble(self):
-        if not self.isEmpty():
-            curtime, task = self.pop()
-            self.timeLine = curtime
-            while not self.isEmpty() and curtime == task.getNextTime():
+        if self.isEmpty():
+            return None
+
+        currentTime, task = self.tasks[0]
+        self.timeLine.time = currentTime
+
+        while not self.isEmpty():
+            taskTime, task = self.tasks[0]
+            if currentTime == taskTime:
+                self.pop()
                 if task.bubble():
                     self.add(task)
-                task = self.pop()[1]
-
-            return curtime
-
-        return None
+            else:
+                break
+        return currentTime
 

@@ -14,6 +14,7 @@ class EventFlow(object):
         self.changed = True
 
     def addNode(self, node):
+        node.setEventFlow(self)
         self.nodes.add(node)
         self.setChanged()
 
@@ -48,8 +49,9 @@ class EventFlow(object):
         self.raisedNodes = []
 
         for level in range(0,self.maxLevel + 1):
-            for node in runList[level]:
-                node.bubble(processId)
+            if level < len(runList):
+                for node in runList[level]:
+                    node.process(processId)
 
         self.assignLevel()
 
