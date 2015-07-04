@@ -1,10 +1,12 @@
 __author__ = 'shgli'
 from ITradingComponent import ITradingComponent
+from EventNode import EventNode
 import EventType
-class ITradingBrain(ITradingComponent):
+class ITradingBrain(ITradingComponent, EventNode):
 
-    def __init__(self,name,type,tradingContext):
-        super(ITradingBrain,self).__init__(name,type,tradingContext)
+    def __init__(self, name, type, tradingContext):
+        super(ITradingBrain, self).__init__(name, tradingContext)
+        EventNode.__init__(self, name, type)
         self.__timer = []
         self.__marketData = []
 

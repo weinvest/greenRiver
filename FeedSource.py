@@ -3,7 +3,7 @@ import Logger
 from ITradingComponent import ITradingComponent
 class FeedSource(ITradingComponent):
     def __init__(self, tradingContext, feederCreator):
-        super(FeedSource,self).__init__(tradingContext)
+        super(FeedSource,self).__init__('FeedSource', tradingContext)
 
         if feederCreator is None:
             Logger.critical("feed creator is None")

@@ -7,8 +7,8 @@ from Calendar import Calendar
 
 
 class InstrumentManager(ITradingComponent):
-    def __init__(self,tradingContext,mappingDirectory):
-        super(InstrumentManager,self).__init__(tradingContext)
+    def __init__(self, tradingContext, mappingDirectory):
+        super(InstrumentManager,self).__init__('InstrumentManager', tradingContext)
         self.mappingDirectory = mappingDirectory
         self.futures = pd.DataFrame()
 

@@ -4,9 +4,27 @@ from FeedSource import  FeedSource
 from LocalFeederCreator import LocalFeederCreator
 from TradingContext import TradingContext
 from Calendar import Calendar
+from ISignal import ISignal
+from Symbol import Symbol
 import argparse
 import sys
 import os
+
+class OutputMarket(ISignal):
+    def __init__(self, tradingContext, symbol):
+        super(OutputMarket, self).__init__('Output', tradingContext)
+        self.symbol = symbol
+
+
+    def onBeginDay(self):
+        self.feeder = self.subscribe(self.symbol)
+        print('Bid1Price,Bid1Qty,Ask1Qty,Ask1Price')
+
+    def onMarketData(self,dates):
+        print('%lf,%d,%d,%lf' %(self.feeder.getBidPrice(0),self.feeder.getBidQty(0),self.feeder.getAskQty(0),self.feeder.getAskPrice(0)))
+
+    def onEndDay(self, tradingDay):
+        self.feeder.data.LastPrice.plot()
 
 if __name__ == '__main__':
     scriptPath,greenRiver = os.path.split(os.path.abspath(sys.argv[0]))
@@ -25,9 +43,11 @@ if __name__ == '__main__':
     tradingContext = TradingContext()
     tradingContext.instrumentManager = InstrumentManager(tradingContext,args.mappingRoot)
     tradingContext.feedSource = FeedSource(tradingContext,LocalFeederCreator(args.dataRoot))
-    tradingContext.calendar = Calendar(open(args.holidayFile,'r'))
+    tradingContext.calendar = Calendar(open(args.holidayFile, 'r'))
 
     tradingContext.initialize(Calendar.dateFromString(args.fromDay),Calendar.dateFromString(args.toDay))
+
+    outSignal = OutputMarket(tradingContext, Symbol('IF_01','CFFEX'))
 
     tradingContext.run()
 
