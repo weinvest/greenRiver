@@ -7,6 +7,7 @@ class ITradingBrain(ITradingComponent, EventNode):
     def __init__(self, name, type, tradingContext):
         super(ITradingBrain, self).__init__(name, tradingContext)
         EventNode.__init__(self, name, type)
+        self.tradingContext.eventFlow.addNode(self)
         self.__timer = []
         self.__marketData = []
 

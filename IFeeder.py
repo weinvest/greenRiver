@@ -4,7 +4,7 @@ from TimeTask import TimeTask
 import EventType
 class IFeeder(EventNode,TimeTask):
     def __init__(self,name,timeLine):
-        EventNode.__init__(self, EventType.FeedEvent)
+        EventNode.__init__(self, name, EventType.FeedEvent)
         self.timeLine = timeLine
 
     def getMidPrice(self):

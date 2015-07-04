@@ -16,14 +16,14 @@ class InstrumentManager(ITradingComponent):
         mappingFileName = os.path.join(self.mappingDirectory, Calendar.dateToString(tradingDay) + '.mapping.csv')
         if not os.path.isfile(mappingFileName):
             raise Exception('can not open mapping file %s' % mappingFileName)
-        self.futures = self.loadFromFile(mappingFileName)
+        self.loadFromFile(mappingFileName)
 
     def onEndDay(self, tradingDay):
         pass
 
     def loadFromFile(self, mappingFileName):
-        self.futures = pd.read_csv(mappingFileName, index_col='Name')
-        self.futures['Product'] = self.futures.index.map(lambda name: name.split('_')[0])
+        self.futures = pd.read_csv(mappingFileName)
+        self.futures['Product'] = self.futures.Name.map(lambda name: name.split('_')[0])
 
     def getFuture(self, symbol):
         future = self.futures[symbol(self.futures)]

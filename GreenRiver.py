@@ -16,7 +16,7 @@ class OutputMarket(ISignal):
         self.symbol = symbol
 
 
-    def onBeginDay(self):
+    def onBeginDay(self, tradingDay):
         self.feeder = self.subscribe(self.symbol)
         print('Bid1Price,Bid1Qty,Ask1Qty,Ask1Price')
 

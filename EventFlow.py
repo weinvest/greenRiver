@@ -39,6 +39,7 @@ class EventFlow(object):
             self.maxLevel = max(self.maxLevel,node.level)
 
     def foreachNode(self,visitor):
+        self.assignLevel()
         for node in self.sortedNodes:
             visitor(node)
 

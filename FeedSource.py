@@ -17,8 +17,8 @@ class FeedSource(ITradingComponent):
 
     def subscribe(self,instrument):
         if not self.feeders.has_key(instrument.Name):
-            feeder = self.feederCreator.create(instrument,self.timeLine)
-            feeder.initialize(self.tradingDay, self.getCurrentTradingSession())
+            feeder = self.feederCreator.create(instrument,self.tradingContext.timeLine)
+            feeder.initialize(self.getCurrentTradingSession())
             self.feeders[instrument.Name] = feeder
             self.addTask(feeder)
         return self.feeders[instrument.Name]
